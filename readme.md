@@ -9,7 +9,23 @@ For example, if you wanted to detect the locations of stars in an image, but tha
 [IPP](https://www.intel.com/content/www/us/en/developer/tools/oneapi/ipp.html) needs to be installed.
 A standalone installation of IPP is used.
 A getting started guide is [here](https://www.intel.com/content/www/us/en/develop/documentation/get-started-with-ipp-for-oneapi-linux/top.html) with some example code which is copied to `ipp_getting_started_example.cpp` with the `@` characters removed (g++ did not compile with unicode).
+
 To compile, first in the terminal `source /opt/intel/oneapi/ipp/latest/env/vars.sh`.
-Then `g++ ipp_getting_started_example.cpp -o ipptest -I $IPPROOT/include -L $IPPROOT/lib/linux -lippcore`.
-Finally, `./ipptest`.
+Then 
+
+```bash
+g++ ipp_getting_started_example.cpp -o ipp_getting_started_example -I $IPPROOT/include -L $IPPROOT/lib/linux -lippcore
+```
+
+Finally, execute `./ipp_getting_started_example`.
 You should see a print out of a table with features and their support.
+
+[OpenCV](https://opencv.org/) is used to read in images.
+It's built from source.
+A function to test loading and displaying an image can be built and ran with
+
+```bash
+ g++ open_image.cpp -o open_image `pkg-config --cflags --libs opencv4` && ./open_image 
+```
+
+The above code uses [this stary image](https://pixabay.com/photos/astronomy-bright-constellation-dark-1867616/) the open source image from pixabay.
