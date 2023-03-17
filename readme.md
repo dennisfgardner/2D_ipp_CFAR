@@ -29,3 +29,23 @@ A function to test loading and displaying an image can be built and ran with
 ```
 
 The above code uses [this stary image](https://pixabay.com/photos/astronomy-bright-constellation-dark-1867616/) the open source image from pixabay.
+
+## Main Program
+
+add IPP headers and libraies to path
+
+```bash
+source /opt/intel/oneapi/ipp/latest/env/vars.sh 
+```
+
+Build and run with
+
+```bash
+g++ main.cpp -o main -I $IPPROOT/include -L $IPPROOT/lib/intel64 -lippi -lipps -lippcore -lippcv `pkg-config --cflags --libs opencv4` && ./main 
+```
+
+Build and check for memory leaks with:
+
+```bash
+g++ main.cpp -g -oo -Wextra -pedantic -Wshadow -I $IPPROOT/include -L $IPPROOT/lib/intel64 -lippi -lipps -lippcore -lippcv `pkg-config --cflags --libs opencv4` -o main && valgrind --leak-check=full --show-leak-kinds=all -s ./main 
+```
