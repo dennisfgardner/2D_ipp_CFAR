@@ -11,6 +11,12 @@ int main(){
 
     img = cv::imread("hd-wallpaper-1867616.jpg", cv::IMREAD_COLOR);
 
+    std::cout << "the data type is " << img.type() << "\n";
+
+    int rows = img.rows;
+    int cols = img.cols;
+    std::cout << "rows " << rows << " cols " << cols << "\n";
+
     std::string win_name = "Display Window";
     cv::namedWindow(win_name, cv::WINDOW_NORMAL);
     cv::resizeWindow(win_name, 512, 512);
