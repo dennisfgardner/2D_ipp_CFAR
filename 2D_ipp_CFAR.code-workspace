@@ -7,10 +7,15 @@
 	"settings": {
 		"cSpell.words": [
 			"CFAR",
+			"disp",
+			"halfwidth",
+			"imread",
+			"ippi",
 			"IPPROOT",
 			"ipptest",
 			"lippcore",
 			"oneapi"
-		]
+		],
+		"python.linting.flake8Enabled": true,
 	}
 }
