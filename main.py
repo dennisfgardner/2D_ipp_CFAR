@@ -50,7 +50,7 @@ def cfar_2d(path_to_image):
     | local stats calculated|
     |_______________________|
 
-     """
+    """
 
     img = cv2.imread(path_to_image, cv2.IMREAD_GRAYSCALE).astype(float)
 
