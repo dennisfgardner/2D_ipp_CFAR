@@ -17,5 +17,9 @@
 			"oneapi"
 		],
 		"python.linting.flake8Enabled": true,
+		"files.associations": {
+			"ostream": "cpp",
+			"iostream": "cpp"
+		},
 	}
 }
