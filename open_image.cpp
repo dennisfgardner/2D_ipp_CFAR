@@ -9,7 +9,7 @@ int main(){
 
     cv::Mat img;
 
-    img = cv::imread("hd-wallpaper-1867616.jpg", cv::IMREAD_COLOR);
+    img = cv::imread("test_image.jpg", cv::IMREAD_COLOR);
 
     std::cout << "the data type is " << img.type() << "\n";
 
