@@ -190,7 +190,7 @@ int main(){
 
     // read image and display image
     cv::Mat img;
-    img = cv::imread("test_image.jpg", cv::IMREAD_GRAYSCALE);
+    img = cv::imread("example_image.jpg", cv::IMREAD_GRAYSCALE);
     img.convertTo(img, CV_32FC1);
 
     #ifdef DEBUG_PLOTS

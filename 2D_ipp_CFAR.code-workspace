@@ -14,7 +14,8 @@
 			"IPPROOT",
 			"ipptest",
 			"lippcore",
-			"oneapi"
+			"oneapi",
+			"thresholding"
 		],
 		"python.linting.flake8Enabled": true,
 		"files.associations": {
