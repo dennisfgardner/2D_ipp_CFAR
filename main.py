@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -34,7 +35,7 @@ def doughnut_mean(img, window_halfwidth, guard_halfwidth):
     return (win - grd)/(win_width**2 - grd_width**2)
 
 
-def cfar_2d(path_to_image):
+def cfar_2d(path_to_image, guard_halfwidth, local_bkg_halfwidth, deviation):
     """Constant False Alarm Rate Detector in Two-Dimensions
 
     The local statistics is calculated around the pixel-under-test excluding a
@@ -55,38 +56,76 @@ def cfar_2d(path_to_image):
 
     """
 
+    # default values
+    if guard_halfwidth is None:
+        guard_halfwidth = 20
+    if local_bkg_halfwidth is None:
+        local_bkg_halfwidth = 50
+    if deviation is None:
+        deviation = 2.5
+    if DEBUG:
+        print("input parameters:")
+        print(f"\t{path_to_image=}")
+        print(f"\t{guard_halfwidth=}")
+        print(f"\t{local_bkg_halfwidth=}")
+        print(f"\t{deviation=}")
+
+    # read image
     img = cv2.imread(path_to_image, cv2.IMREAD_GRAYSCALE).astype(float)
     if DEBUG:
-        print(f"img input min {np.min(img)} max {np.max(img)}")
-    # calculate the standard deviation
-    local_bkg_halfwidth = 50
-    guard_halfwidth = 20
-    # E[x], expectation value, i.e., the mean
+        print("input image read:")
+        print(f"\tshape: {img.shape}")
+        print(f"\ttype: {img.dtype}")
+        print(f"\tmin {np.min(img)}, max {np.max(img)}")
+        print(f"\tcenter pixel: {img[img.shape[0]//2 + 1, img.shape[1]//2 + 1]}")
+        disp_img_mpl(img, "Input Image")
+
+    # the next few chunks of code is going to calculate standard deviation as
+    # sqrt(E[x^2] - (E[x])^2) where E is the expectation value (i.e. the mean)
+    # see wiki for details https://en.wikipedia.org/wiki/Standard_deviation
+    # |
+    # |
+    # V
+    #
+    # E[x]
     E_x = doughnut_mean(img, local_bkg_halfwidth, guard_halfwidth)
     if DEBUG:
-        print(f"E_x min {np.min(E_x)} max {np.max(E_x)}")
+        print("Expectation Value Calculated")
+        print(f"\tmin {np.min(E_x)} max {np.max(E_x)}")
+        print(f"\tcenter pixel: {E_x[E_x.shape[0]//2 + 1, E_x.shape[1]//2 + 1]}")
+        disp_img_mpl(E_x, "Expectation Value")
+
     # E[x^2] expectation value of image values squared
     E_xsqrd = doughnut_mean(img**2, local_bkg_halfwidth, guard_halfwidth)
     if DEBUG:
-        print(f"E_xsqrd min {np.min(E_xsqrd)} max {np.max(E_xsqrd)}")
-    # standard deviation is sqrt(E[x^2] - (E[x])^2), see wiki for more details
+        print("Image**2 Expectation Value Calculated")
+        print(f"\t min {np.min(E_xsqrd)} max {np.max(E_xsqrd)}")
+        print(f"\tcenter pixel: {E_xsqrd[E_xsqrd.shape[0]//2 + 1, E_xsqrd.shape[1]//2 + 1]}")
+        disp_img_mpl(E_xsqrd, "Image**2 Expectation Value")
+
+    # standard deviation 
     std_dev = cv2.sqrt(E_xsqrd - (E_x**2))
     if DEBUG:
-        print(f"std_dev min {np.min(std_dev)} max {np.max(std_dev)}")
+        print("Standard Deviation Calculated")
+        print(f"\tmin {np.min(std_dev)} max {np.max(std_dev)}")
+        print(f"\tcenter pixel: {std_dev[std_dev.shape[0]//2 + 1, std_dev.shape[1]//2 + 1]}")
+        disp_img_mpl(std_dev, "Standard Deviation")
+    # ^
+    # |
+    # |
+    # end of standard deviation calculation
+
     # threshold to find pixels of interest
-    deviation = 2.5
     threshold_values = E_x + deviation*std_dev
     if DEBUG:
-        print(f"threshold_values min {np.min(threshold_values)} max {np.max(threshold_values)}")
+        print("Threshold Calculated")
+        print(f"\t min {np.min(threshold_values)} max {np.max(threshold_values)}")
+        print(f"\tcenter pixel: {threshold_values[threshold_values.shape[0]//2 + 1, threshold_values.shape[1]//2 + 1]}")
+
+        disp_img_mpl(threshold_values, "Threshold Values")
     outliers = img > threshold_values
 
-    # disp_img_mpl(img, "Original")
-    # disp_img_mpl(E_x, "E_x")
-    # disp_img_mpl(std_dev, "std_dev")
-    # disp_img_mpl(threshold_values, "threshold_values")
-    # disp_img_mpl(outliers, "outliers")
-
-    fig, axs = plt.subplots(2, 1, figsize=(16, 9), sharex=True, sharey=True)
+    fig, axs = plt.subplots(1, 2, figsize=(16, 9), sharex=True, sharey=True)
     axs[0].imshow(img)
     axs[0].set_title("input")
     axs[1].imshow(outliers)
@@ -94,9 +133,23 @@ def cfar_2d(path_to_image):
     plt.show()
 
 
-if __name__ == '__main__':
+def main():
+    """main entry point, must pass in filepath to image"""
     ap = argparse.ArgumentParser()
-    ap.add_argument('-i', '--image', required=True, help='Path to image')
+    ap.add_argument('-I', '--image', required=True, help='Path to image')
+    ap.add_argument('-G', '--guard', required=False, type=int,
+                    help='inner guard size halfwidth')
+    ap.add_argument('-B', '--bkg', required=False, type=int,
+                    help='outer local background halfwidth')
+    ap.add_argument('-T', '--threshold', required=False, type=int,
+                    help='standard deviation threshold')
     args = ap.parse_args()
 
-    cfar_2d(args.image)
+    if Path(args.image).exists():
+        cfar_2d(args.image, args.guard, args.bkg, args.threshold)
+    else:
+        print("image filepath does not exist")
+
+
+if __name__ == '__main__':
+    main()

@@ -8,8 +8,10 @@
 		"cSpell.words": [
 			"CFAR",
 			"disp",
+			"figsize",
 			"halfwidth",
 			"imread",
+			"imshow",
 			"ippi",
 			"IPPROOT",
 			"ipptest",

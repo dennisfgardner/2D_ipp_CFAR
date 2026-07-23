@@ -87,3 +87,10 @@ g++ main.cpp -g -oo -Wextra -pedantic -Wshadow -I $IPPROOT/include -L $IPPROOT/l
 
 - [Wikipedia article on Constant False Alarm Rate Detectors](https://en.wikipedia.org/wiki/Constant_false_alarm_rate)
 - [An, G., Huang, Z. & Li, Y. Constant false alarm rate detection of pipeline leakage based on acoustic sensors. Sci Rep 13, 14149 (2023).](https://doi.org/10.1038/s41598-023-41177-3)
+
+## Testing
+
+A version of the code, employing the same math, was written in python and opencv.
+This allows a cross check of the IPP and C++ code.
+A script called `create_test_image.py` saves a *test_image.png*.
+This test image can be used with these parameters `python main.py -I test_image.png -G 3 -B 7` to verify the calculations are correct.
